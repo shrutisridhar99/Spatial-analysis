@@ -1,4 +1,4 @@
-# PhD_code
+# Code database 
 
 ## Spatial analysis 
 1. Recursive Gibbs model 
