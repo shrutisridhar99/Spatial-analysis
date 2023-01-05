@@ -1,15 +1,15 @@
-# Code database 
+# Description 
 
-## Spatial analysis 
-1. Recursive Gibbs model 
-2. K means clustering
+## Spatial Project 
+1. Code
+  a. Geyer function 
+  b. K means 
+2. Data 
+  a. Geyer output
+  b. Patient id matching
+3. Results 
+  a. Clusters
+  b. Kmeans convergence
+  c. Optimal clusters
 
-## Spatial results 
-1. Recurive Geyer csv 
-2. K Cross function for all marks 
-3. K means clustering 
-4. Optimal clusters found 
 
-## Single cell analyis
-1. Basic pipeline code
-2. Pseudotime/trajectoey analysis 
