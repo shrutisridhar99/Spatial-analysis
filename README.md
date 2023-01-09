@@ -2,14 +2,14 @@
 
 ## Spatial Project 
 1. Code
-  a. Geyer function 
-  b. K means 
+  * Geyer function 
+  * K means 
 2. Data 
-  a. Geyer output
-  b. Patient id matching
+  * Geyer output
+  * Patient id matching
 3. Results 
-  a. Clusters
-  b. Kmeans convergence
-  c. Optimal clusters
+  * Clusters
+  * Kmeans convergence
+  * Optimal clusters
 
 
