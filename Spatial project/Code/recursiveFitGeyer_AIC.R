@@ -88,3 +88,26 @@ df
 write.csv(df, file = "~/Desktop/geyer_No_AIC_batch09.csv")
 
 # sink()
+
+
+## Get the number of marks for each cluster
+
+geyer_data <- read.csv("~/index copy/_book/PhD_code/Spatial project/Data/Geyer_BCA.csv")
+files <- list.files(path = "~/Downloads/BCA_RDS_new_total/", full.names = TRUE)
+df <- data.frame(matrix(ncol = 13, nrow = 0))
+for (file_index in 1:length(files)) {
+  
+  # Read each file and parse the data
+  file.name <- files[file_index]
+  
+  # extract the name of the file 
+  name.of.the.file <- basename(file.name)
+  
+  MyObjectsData <- readRDS(file=file.name)
+  freq <- table(MyObjectsData$marks)
+  df_1 <- c(name.of.the.file, as.numeric(freq[1:9]))
+  df <- rbind(df, as.data.frame(t(df_1)))
+  
+}
+  
+  
