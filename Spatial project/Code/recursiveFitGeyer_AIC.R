@@ -5,7 +5,7 @@ library(spatstat)
 #------------------------------------------------------------------#
 
 # Read file names from the path into a vector
-files <- list.files(path = "~/Desktop/TCGA/TCGA-GBM/Slide_Processing/TCGA-Processed/Matlab-Processed/csvs/batch09", full.names = TRUE)
+files <- list.files(path = "~/Downloads/BCA_RDS_new_total/", full.names = TRUE)
 
 # Start writing to an output file
 # sink('~/Desktop/analysis-output_1.txt')
@@ -24,11 +24,13 @@ for (file_index in 1:length(files)) {
   # print(file.name)
   # print("--------------------------------------------------------------------")
 
-  MyObjectsData <- read.csv(file=file.name, header=TRUE, sep=",")
+  MyObjectsData <- readRDS(name.of.the.file)
   
   # Identify the x and y coordinates
-  x <- MyObjectsData$Centroid_1
-  y <- MyObjectsData$Centroid_2
+  x <- MyObjectsData$x
+  y <- MyObjectsData$y
+  marks <- MyObjectsData$marks
+  MyObjectsData$marks <- as.factor(MyObjectsData$marks)
   
   # Create a point process object and display it
   p <- ppp(x,y,c(1,max(x)),c(1,max(y)))
@@ -55,7 +57,7 @@ for (file_index in 1:length(files)) {
   
   # Instead of the above fitting, we do a profilepl fit that computes 
   # pseudologlikelihood measures in the data frame defined by rvals
-  rvals <- seq(1, 20, by = 0.1)
+  rvals <- seq(1, 15, by = 0.5)
   D <- expand.grid(r = rvals, sat= seq(1, 3, by=1))
   # Fit the model for several data points
   fitp <- profilepl(D, Geyer, p ~ polynom(x,y,2), aic=FALSE)
@@ -69,7 +71,8 @@ for (file_index in 1:length(files)) {
   gamma <- exp(X$coef[7])
   
   # Get the interaction distance
-  interaction.distance <- fitp$fit$interaction$par[1]
+  interaction.distance <- fitp$fit$interaction$par[1]fitp <- profilepl(D, Geyer, MyObjectsData ~ marks, aic=FALSE)
+
   saturation.parameter <- fitp$fit$interaction$par[2]
   
   # We form the data frame and populate the computed coeffients 
@@ -110,4 +113,8 @@ for (file_index in 1:length(files)) {
   
 }
   
+
+## Recursive MultiStrauss process 
+
+
   
