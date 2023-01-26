@@ -10,7 +10,7 @@ files <- list.files(path = "~/Downloads/BCA_RDS_new_total/", full.names = TRUE)
 # Start writing to an output file
 # sink('~/Desktop/analysis-output_1.txt')
 
-df <- data.frame(matrix(ncol = 13, nrow = 0))
+df <- data.frame(matrix(ncol = 67, nrow = 0))
 
 for (file_index in 1:length(files)) {
   
@@ -24,7 +24,7 @@ for (file_index in 1:length(files)) {
   # print(file.name)
   # print("--------------------------------------------------------------------")
 
-  MyObjectsData <- readRDS(name.of.the.file)
+  MyObjectsData <- readRDS(file.name)
   
   # Identify the x and y coordinates
   x <- MyObjectsData$x
@@ -71,7 +71,7 @@ for (file_index in 1:length(files)) {
   gamma <- exp(X$coef[7])
   
   # Get the interaction distance
-  interaction.distance <- fitp$fit$interaction$par[1]fitp <- profilepl(D, Geyer, MyObjectsData ~ marks, aic=FALSE)
+  interaction.distance <- fitp$fit$interaction$par[1]
 
   saturation.parameter <- fitp$fit$interaction$par[2]
   
@@ -88,7 +88,7 @@ names(df) <-  c("Name","Intercept","x","y","I(x^2)","I(x * y)","I(y^2)","log(Int
 df
 
 # Write CSV in Desktop
-write.csv(df, file = "~/Desktop/geyer_No_AIC_batch09.csv")
+write.csv(df, file = "~/Desktop/SHG.csv")
 
 # sink()
 
