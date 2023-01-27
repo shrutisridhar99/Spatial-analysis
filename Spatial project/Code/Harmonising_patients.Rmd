@@ -70,11 +70,21 @@ surv <- surv[-1,]
 rownames(surv) <- surv$`DLC-ID`
 rownames(meta) <- meta$Patient
 meta_final <- merge(meta, surv, by = 'row.names', all = T)
-meta_final_na <- na.omit(meta_final$cluster)
+meta_final_na <- meta_final[complete.cases(meta_final$cluster),]
 
 write.csv(meta_final, "~/index copy/_book/PhD_code/Spatial project/Data/BCA/metadata_clusters_all.csv")
 
 
 ```
+
+```{r}
+#Survival analysis 
+library(survival)
+library(survminer)
+
+fit <- survfit(Surv(CODE_OS, OS) ~ cluster, data = meta_final_na)
+survp <- ggsurvplot(fit, data = merged.data, risk.table = TRUE, pval=TRUE, palette = c("red", "blue"))
+
 ```
+
 
