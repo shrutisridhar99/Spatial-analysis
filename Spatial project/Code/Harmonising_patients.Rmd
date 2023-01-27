@@ -50,6 +50,31 @@ fviz_cluster(list(data = features, cluster = km.res$cluster), ellipse.type = "no
   xlab("Optimal L-function") + ylab("Optimal Interaction Distance") 
 
 
+#Save files 
 
+write.csv(km.res$cluster,  "~/index copy/_book/PhD_code/Spatial project/Results /BCA/Harmonised/km.cluster.csv")
+
+
+```
+
+```{r}
+#integrate with meta data 
+
+meta <- geyer_data_sum
+meta$cluster <- km.res$cluster
+
+surv <- read_excel("~/index copy/_book/PhD_code/Spatial project/Data/BCA/Survival_data_BCA.xlsx")
+surv <- as.data.frame(surv)
+colnames(surv) <- surv[1,]
+surv <- surv[-1,]
+rownames(surv) <- surv$`DLC-ID`
+rownames(meta) <- meta$Patient
+meta_final <- merge(meta, surv, by = 'row.names', all = T)
+meta_final_na <- na.omit(meta_final$cluster)
+
+write.csv(meta_final, "~/index copy/_book/PhD_code/Spatial project/Data/BCA/metadata_clusters_all.csv")
+
+
+```
 ```
 
