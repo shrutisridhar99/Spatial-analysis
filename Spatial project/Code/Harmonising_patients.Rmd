@@ -1,0 +1,55 @@
+---
+title: "Harmonising"
+author: "Shruti"
+date: "19/01/2023"
+output: html_document
+---
+
+```{r}
+#Load in Geyer Data 
+
+library(readxl)
+library(dplyr)
+
+geyer_data <- read_excel("~/index copy/_book/PhD_code/Spatial project/Data/Geyer_BCA.xlsx")
+geyer_data <- as.data.frame(geyer_data)
+```
+
+```{r}
+#Average the OptL and IntD
+
+geyer_data_num <- geyer_data
+geyer_data_num$OptL <- as.numeric(geyer_data_num$OptL)
+geyer_data_sum <- geyer_data_num %>% group_by(Patient) %>% summarise_at(c("OptL", "Interaction Distance"), mean, na.rm = T)
+
+                                                                     
+```
+
+```{r}
+#Kmeans with the average
+library(cluster)
+library(factoextra)
+library(readxl)
+library("NbClust")
+
+geyer_data_sum$OptL <- as.numeric(geyer_data_sum$OptL)
+geyer_data_sum$`Interaction Distance` <- as.numeric(geyer_data_sum$`Interaction Distance`)
+
+features <- geyer_data_sum
+features <- features %>% dplyr::select(OptL,`Interaction Distance`)
+features <- scale(features)
+features <- na.omit(features)
+
+
+res.nbclust <- NbClust(features, distance = "euclidean", min.nc = 2, max.nc = 10, method = "median", index ="all")
+factoextra::fviz_nbclust(res.nbclust) + theme_minimal()
+
+km.res <- kmeans(features, 2)
+fviz_cluster(list(data = features, cluster = km.res$cluster), ellipse.type = "norm", geom = "point", stand = FALSE, ggtheme = theme_classic(),
+             ellipse.level = 0.7, ellipse.alpha = 0.1, palette = c("red","blue")) +
+  xlab("Optimal L-function") + ylab("Optimal Interaction Distance") 
+
+
+
+```
+
