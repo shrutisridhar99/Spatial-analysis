@@ -82,8 +82,13 @@ write.csv(meta_final, "~/index copy/_book/PhD_code/Spatial project/Data/BCA/meta
 library(survival)
 library(survminer)
 
-fit <- survfit(Surv(CODE_OS, OS) ~ cluster, data = meta_final_na)
-survp <- ggsurvplot(fit, data = merged.data, risk.table = TRUE, pval=TRUE, palette = c("red", "blue"))
+meta_final_na$CODE_OS <- as.numeric(as.character(meta_final_na$CODE_OS))
+meta_final_na$OS <- as.numeric(meta_final_na$OS)
+
+fit <- survfit(Surv(OS, CODE_OS) ~ cluster, data = meta_final_na)
+survp <- ggsurvplot(fit, data = meta_final_na, risk.table = TRUE, pval=TRUE, palette = c("red", "blue"))
+
+ggsave(file = "~/index copy/_book/PhD_code/Spatial project/Results /BCA/Harmonised/survival.png")
 
 ```
 
