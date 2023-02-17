@@ -17,6 +17,8 @@ files <- list.files(path = "~/Downloads/BCA_RDS_new_total/", full.names = TRUE)
 ```{r}
 df <- data.frame(matrix(ncol = 568, nrow = 0))
 
+
+
 for (file_index in 1:length(files)) {
   
   # Read each file and parse the data
@@ -40,15 +42,15 @@ for (file_index in 1:length(files)) {
   # Create a point process object and display it
  # p <- ppp(x,y,c(1,max(x)),c(1,max(y)))
   
-  p <- subset(MyObjectsData, marks == "Mp2p6n", drop = T)
+  p <- subset(MyObjectsData, marks == "Mp2p6n", drop = F)
   p$marks <- as.factor(p$marks)
   
-  if(is.empty(p)) {
-    
-    warning("this file is empty")
-    
-    return(NULL)}
   print(name.of.the.file)
+  
+  if(is.empty(p)) next
+
+
+  
   
   #--------------------------------------------------------------------#
   # We now fit Strauss process with 5 microns 
@@ -60,13 +62,13 @@ for (file_index in 1:length(files)) {
   # Computing and ploting the L-function of the dataset and choosing
   # the value r which maximises the discrepancy
 
-  discrep <- function(r) {
-    return(abs(as.function(Lest(p))(r) - r))
-  }
-  res <- optimise(discrep, interval = c(0, 10), maximum = TRUE)
+  #discrep <- function(r) {
+   # return(abs(as.function(Lest(p))(r) - r))
+  #}
+  #res <- optimise(discrep, interval = c(0, 10), maximum = TRUE)
 
   # # Fit the Strauss process for the maximum L-function value 
-  # strauss.parameter <- res$maximum
+  # strauss.parameter <-res$maximum
   # 
   # X <- ppm(p ~ polynom(x,y,2), Strauss(strauss.parameter))
   
@@ -76,7 +78,7 @@ for (file_index in 1:length(files)) {
   rvals <- seq(1, 20, by = 0.3)
   D <- expand.grid(r = rvals, sat= seq(1, 3, by=1))
   # Fit the model for several data points
-  fitp <- profilepl(D, Strauss, p ~ polynom(x,y,2), aic=FALSE)
+  fitp <- profilepl(D, Geyer, p ~ polynom(x,y,2), aic=FALSE)
   # Plot the AIC values (for checking correctness)
   #plot(fitp)
   
@@ -89,7 +91,7 @@ for (file_index in 1:length(files)) {
   # Get the interaction distance
   interaction.distance <- fitp$fit$interaction$par[1]
 
-  saturation.parameter <- fitp$fit$interaction$r
+  saturation.parameter <- fitp$fit$interaction$par[2]
   
   # We form the data frame and populate the computed coeffients 
   fit.coeff <- c(name.of.the.file, as.numeric(X$coef[1:7]), as.numeric(gamma), as.numeric(res), as.numeric(interaction.distance$r),
