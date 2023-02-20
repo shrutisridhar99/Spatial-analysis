@@ -1,0 +1,11 @@
+---
+title: "Bansky"
+author: "Shruti"
+date: "16/02/2023"
+output: html_document
+---
+```{r}
+library(Banksy)
+dds <- read.csv("~/index copy/_book/PhD_code/Spatial project/Bansky/Trial.csv")
+```
+
