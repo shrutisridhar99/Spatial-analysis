@@ -11,8 +11,10 @@ output: html_document
 library(readxl)
 library(dplyr)
 
-geyer_data <- read_excel("~/index copy/_book/PhD_code/Spatial project/Data/Geyer_BCA.xlsx")
+geyer_data <- read_excel("~/index copy/_book/PhD_code/Spatial project/Data/BCA/Geyer_BCA_all.xlsx")
 geyer_data <- as.data.frame(geyer_data)
+#colnames(geyer_data) <- geyer_data[c(1),]
+#geyer_data <- geyer_data[-c(1),]
 ```
 
 ```{r}
@@ -20,6 +22,7 @@ geyer_data <- as.data.frame(geyer_data)
 
 geyer_data_num <- geyer_data
 geyer_data_num$OptL <- as.numeric(geyer_data_num$OptL)
+geyer_data_num$`Interaction Distance` <- as.numeric(geyer_data_num$`Interaction Distance`)
 geyer_data_sum <- geyer_data_num %>% group_by(Patient) %>% summarise_at(c("OptL", "Interaction Distance"), mean, na.rm = T)
 
                                                                      
@@ -33,10 +36,10 @@ library(readxl)
 library("NbClust")
 
 geyer_data_sum$OptL <- as.numeric(geyer_data_sum$OptL)
-geyer_data_sum$`Interaction Distance` <- as.numeric(geyer_data_sum$`Interaction Distance`)
+geyer_data_sum$`Interaction.Distance` <- as.numeric(geyer_data_sum$`Interaction Distance`)
 
 features <- geyer_data_sum
-features <- features %>% dplyr::select(OptL,`Interaction Distance`)
+features <- features %>% dplyr::select(OptL,`Interaction.Distance`)
 features <- scale(features)
 features <- na.omit(features)
 
@@ -46,7 +49,7 @@ factoextra::fviz_nbclust(res.nbclust) + theme_minimal()
 
 km.res <- kmeans(features, 2)
 fviz_cluster(list(data = features, cluster = km.res$cluster), ellipse.type = "norm", geom = "point", stand = FALSE, ggtheme = theme_classic(),
-             ellipse.level = 0.7, ellipse.alpha = 0.1, palette = c("red","blue")) +
+             ellipse.level = 0.7, ellipse.alpha = 0.1, palette = c("red","blue", "green")) +
   xlab("Optimal L-function") + ylab("Optimal Interaction Distance") 
 
 
@@ -68,8 +71,9 @@ surv <- as.data.frame(surv)
 colnames(surv) <- surv[1,]
 surv <- surv[-1,]
 rownames(surv) <- surv$`DLC-ID`
-rownames(meta) <- meta$Patient
-meta_final <- merge(meta, surv, by = 'row.names', all = T)
+meta$`DLC-ID` <- meta$Patient
+#surv_1 <- surv[surv$`DLC-ID` %in% meta$Patient]
+meta_final <- merge(meta, surv, by = 'DLC-ID', all = T)
 meta_final_na <- meta_final[complete.cases(meta_final$cluster),]
 
 write.csv(meta_final, "~/index copy/_book/PhD_code/Spatial project/Data/BCA/metadata_clusters_all.csv")
@@ -86,9 +90,13 @@ meta_final_na$CODE_OS <- as.numeric(as.character(meta_final_na$CODE_OS))
 meta_final_na$OS <- as.numeric(meta_final_na$OS)
 
 fit <- survfit(Surv(OS, CODE_OS) ~ cluster, data = meta_final_na)
-survp <- ggsurvplot(fit, data = meta_final_na, risk.table = TRUE, pval=TRUE, palette = c("red", "blue"))
+survp <- ggsurvplot(fit, data = meta_final_na, risk.table = FALSE, pval=TRUE, palette = c("red", "blue"))
 
-ggsave(file = "~/index copy/_book/PhD_code/Spatial project/Results /BCA/Harmonised/survival.png")
+grid.draw.ggsurvplot <- function(x){
+  survminer:::print.ggsurvplot(x, newpage = FALSE)
+}
+
+ggsave(survp, file = "~/index copy/_book/PhD_code/Spatial project/Results /BCA/Harmonised/survival.png")
 
 ```
 
