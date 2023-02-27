@@ -6,6 +6,60 @@ output: html_document
 ---
 ```{r}
 library(Banksy)
-dds <- read.csv("~/index copy/_book/PhD_code/Spatial project/Bansky/Trial.csv")
+library(readxl)
+dds <- read_xlsx("~/Desktop/MDA TMA Raw data.xlsx") 
+dds <- as.data.frame(dds)
+dds <- na.omit(dds)
+
+```
+
+```{r}
+expr <- dds[,c(10:38)]
+expr <- t(expr)
+colnames(expr) <- rownames(dds)
+locs <- dds[,c(8,9)]
+rownames(locs) <- rownames(dds)
+meta <- dds[,c(4,6,39)]
+total_count <- colSums(expr)
+meta <- cbind(meta, total_count = total_count)
+```
+
+```{r}
+bank <- BanksyObject(own.expr = expr, cell.locs = locs, meta.data = meta)
+bank <- SubsetBanksy(bank, metadata = Mp2p6n == "1" & total_count > quantile(total_count, 0.05) & total_count < quantile(total_count, 0.95))
+bank <- na.omit(bank)
+```
+
+```{r}
+bank <- NormalizeBanksy(bank)
+bank <- ComputeBanksy(bank)
+bank <- ScaleBanksy(bank)
+bank <- RunPCA(bank, lambda = 0.5)
+plotReduction(bank, reduction = 'pca_0.2', type = 'discrete')
+bank <- RunUMAP(bank, lambda = 0.5)
+bank <- ClusterBanksy(bank, lambda = 0.5, pca = TRUE, npcs = 20,
+                      method = 'leiden', resolution = 1.2, k.neighbors = 50,
+                      seed = 42)
+p1 <- plotReduction(bank, reduction = 'umap_0.2', by = clust.names(bank), 
+                    type = 'discrete', pt.size = 0.25)
+
+p2 <- plotReduction(bank, reduction = 'umap_0.5', by = clust.names(bank), 
+                    type = 'discrete', pt.size = 0.25)
+
+```
+
+```{r}
+plotSpatial(bank, by = 'Mp2p6n', type = 'discrete')
+
+set.seed(1000)
+plotHeatmap(bank, assay = 'banksy', lambda = 0.5, 
+            annotate = TRUE, 
+            annotate.by = c(clust.names(bank)), 
+            order.by = clust.names(bank), 
+            features = sample(rownames(own.expr(bank)), 100),
+            max.cols = 200)
+
+cnms <- clust.names(bank)
+plotSpatialFeatures(bank, by = cnms, type = rep('discrete'))
 ```
 

@@ -15,11 +15,20 @@ set.seed(123)
 
 
 # Load the Geyer model data
-geyer_data <- read.csv("~/Desktop/geyer_No_AIC_batch09.csv")
+library(readxl)
+geyer_data <- read_xlsx("~/index copy/_book/PhD_code/Spatial project/Data/BCA/Geyer_BCA_all.xlsx")
+geyer_data <- as.data.frame(geyer_data)
+colnames(geyer_data) <- geyer_data[c(1),]
+geyer_data <- geyer_data[-c(1),]
+geyer_data$OptL <- as.numeric(geyer_data$OptL)
+geyer_data$`Interaction.Distance` <- as.numeric(geyer_data$`Interaction.Distance`)
 
 # Get only the relevent features for unsupervised clustering- gamma, optL, LObj, interaction distance
+library(dplyr)
 features <- geyer_data
 features <- features %>% dplyr::select(OptL,`Interaction.Distance`)
+features$OptL <- as.numeric(features$OptL)
+features$`Interaction.Distance` <- as.numeric(features$`Interaction.Distance`)
 features <- scale(features)
 features <- na.omit(features)
 
@@ -29,7 +38,7 @@ features <- na.omit(features)
 res.nbclust <- NbClust(features, distance = "euclidean", min.nc = 2, max.nc = 10, method = "median", index ="all")
 factoextra::fviz_nbclust(res.nbclust) + theme_minimal()
 
-write.csv(res.nbclust$All.index, "~/Dropbox (NYU Langone Health)/my.research/spatial.analysis/Gibbs/Figure.02/optimal.k.index.csv")
+write.csv(res.nbclust$All.index, "~/index copy/_book/PhD_code/Spatial project/Results /BCA/Unharmonised/cluster results /optimal.k.index.csv")
 write.csv(res.nbclust$All.CriticalValues, "~/Dropbox (NYU Langone Health)/my.research/spatial.analysis/Gibbs/Figure.02/optimal.k.all.critical.values.csv")
 write.csv(res.nbclust$Best.nc, "~/Dropbox (NYU Langone Health)/my.research/spatial.analysis/Gibbs/Figure.02/optimal.k.best.nc.csv")
 write.csv(res.nbclust$Best.partition, "~/Dropbox (NYU Langone Health)/my.research/spatial.analysis/Gibbs/Figure.02/optimal.k.best.partition.csv")
@@ -39,9 +48,9 @@ saveRDS(res.nbclust, file = "~/Dropbox (NYU Langone Health)/my.research/spatial.
 # -------------------------------------------------------------------------------------------#
 # We now run k-means with the optimal number of clusters and visualize
 # -------------------------------------------------------------------------------------------#
-km.res <- kmeans(features, 2)
+km.res <- kmeans(features, 2) 
 fviz_cluster(list(data = features, cluster = km.res$cluster), ellipse.type = "norm", geom = "point", stand = FALSE, ggtheme = theme_classic(),
-             ellipse.level = 0.7, ellipse.alpha = 0.1, palette = c("red","blue")) +
+             ellipse.level = 0.7, ellipse.alpha = 0.1, palette = c("red","blue", "black")) +
   xlab("Optimal L-function") + ylab("Optimal Interaction Distance") 
 
 write.csv(km.res$cluster,  "~/Dropbox (NYU Langone Health)/my.research/spatial.analysis/Gibbs/Figure.02/k-means/km.cluster.csv")
